@@ -6,23 +6,7 @@ Snake::Snake(int cellSize)
 	
 	Reset();
 	
-	snakeHead = LoadTexture("Textures/snake-head.png");
-	snakeTail = LoadTexture("Textures/snake-tail.png");
-	snakeBody = LoadTexture("Textures/snake-body.png");
-	snakeCornerL = LoadTexture("Textures/snake-corner-l.png");
-	snakeCornerR = LoadTexture("Textures/snake-corner-r.png");
-	
-	width = snakeHead.width;
-	height = snakeHead.height;
-}
-
-Snake::~Snake()
-{
-	UnloadTexture(snakeHead);
-	UnloadTexture(snakeTail);
-	UnloadTexture(snakeBody);
-	UnloadTexture(snakeCornerL);
-	UnloadTexture(snakeCornerR);
+	snakeTexture = nullptr;
 }
 
 void Snake::Draw()
@@ -30,7 +14,6 @@ void Snake::Draw()
 
 	for (int i = 0; i < body.size(); i++)
 	{
-		Texture2D* texture = &snakeBody;
 		degree = 0;
 		//body directions
 		if (i != 0) {
@@ -41,7 +24,7 @@ void Snake::Draw()
 		}
 		//head direction
 		if(i == 0) {
-			texture = &snakeHead;
+			texturePos = SnakePos::head;
 			if (direction.x == -1) degree = 90;
 			else if (direction.y == -1) degree = 180;
 			else if (direction.x == 1) degree = 270;
@@ -49,26 +32,27 @@ void Snake::Draw()
 		} 
 		//tail direction
 		else if (i == body.size()-1) {
-			texture = &snakeTail;
+			texturePos = SnakePos::tail;
 		}
 		//corner directions
 		else {
 			if (body[i - 1].x != body[i + 1].x && body[i - 1].y != body[i + 1].y) {
-				texture = &snakeCornerL;
+				texturePos = SnakePos::cornerL;
 				int cross = (body[i - 1].x - body[i].x) * (body[i + 1].y - body[i].y)
 						  - (body[i - 1].y - body[i].y) * (body[i + 1].x - body[i].x);
 				//if turn right
 				if (cross > 0) {
 					degree += 90;
-					texture = &snakeCornerR;
+					texturePos = SnakePos::cornerR;
 				}
 			}
-			else texture = &snakeBody;
+			else texturePos = SnakePos::body;
 		}
 		//texture drawings
+		width = snakeTexture->width;
 		DrawTexturePro(
-			*texture,
-			{ 0, 0, width, height },
+			*snakeTexture,
+			{ 0, texturePos* width, width, width },
 			{ float(body[i].x + 0.5) * cellSize, float(body[i].y + 0.5) * cellSize, (float)cellSize, (float)cellSize },
 			{ (float)cellSize / 2, (float)cellSize / 2 },
 			degree,

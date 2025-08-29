@@ -8,21 +8,16 @@ Food::Food(int cellSize, int cellCount, std::deque<Vector2> snakeBody)
     //generating coordinates of apple
 	position = GenerateRandomPos(snakeBody);
 
-	appleTexture = LoadTexture("Textures/apple.png");
-}
-
-Food::~Food()
-{
-	UnloadTexture(appleTexture);
+	foodTexture = nullptr;
 }
 
 void Food::Draw()
 {
 	DrawTextureEx(
-		appleTexture, 
+		*foodTexture,
 		{ position.x * cellSize, position.y * cellSize }, 
 		0.0f, 
-		float(cellSize/appleTexture.width), 
+		float(cellSize/ foodTexture->width),
 		WHITE);
 
 }

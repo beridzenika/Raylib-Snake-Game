@@ -11,22 +11,27 @@ Game::Game(int cellSize, int cellCount)
     lastUpdateTime = 0;
     triggerInterval = 0.2;
     isPaused = false;
+
+    highScore = 0;
+    score = 0;
+
+    food.foodTexture = &menu.GetSelectedFoodTexture();
+    snake.snakeTexture = &menu.GetSelectedSnakeTexture();
 }
 
-Game::~Game()
-{
-}
+
 void Game::Draw() 
 {
     snake.Draw();
     food.Draw();
-    // pausing
-    if (isPaused) {
-        DrawText("Click SPACE to continue", GetScreenWidth() / 6, GetScreenHeight() / 2 - 10, 20, WHITE);
-    }
     // draw scores
     DrawText(TextFormat("score %03i", score), 5, 5, 20, WHITE);
     DrawText(TextFormat("high score %03i", highScore), 5, 30, 10, WHITE);
+
+    // pausing
+    if (isPaused) {
+        menu.Draw();
+    }
 }
 void Game::Update() 
 {
@@ -34,11 +39,12 @@ void Game::Update()
     score = snake.body.size();
     if (score > highScore) highScore = score;
     //changing pause mode
-    if (paused())isPaused = !isPaused;
+    Paused();
+
     
     if (!isPaused) {
         //updating between intervals    
-        triggered = eventTriggered(triggerInterval);
+        triggered = EventTriggered(triggerInterval);
         snake.Update(triggered);
         if (triggered) {
             CheckEating();
@@ -46,16 +52,21 @@ void Game::Update()
             CheckBorderColision();
         }
     }
+    else {
+        menu.Update();
+        triggerInterval = menu.GetSpeed();
+        food.foodTexture = &menu.GetSelectedFoodTexture();
+        snake.snakeTexture = &menu.GetSelectedSnakeTexture();
+    }
 
 }
 
-bool Game::paused()
+void Game::Paused()
 {
-    if (IsKeyPressed(KEY_SPACE)) return true;
-    return false;
+    if (IsKeyPressed(KEY_SPACE)) isPaused = !isPaused;
 }
 
-bool Game::eventTriggered(double interval)
+bool Game::EventTriggered(double interval)
 {
     currentTime = GetTime();
     if (currentTime - lastUpdateTime >= interval) {

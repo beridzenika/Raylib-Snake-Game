@@ -17,7 +17,7 @@ int main() {
 	while (!WindowShouldClose()) 
 	{
 		//update
-			game.Update();
+		game.Update();
 		
 		BeginDrawing();
 		//draw
